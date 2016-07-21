@@ -1,0 +1,33 @@
+<h1><%= @user.name %> <a href="/sessions" data-method='delete'><button>Logout</button></a></h1>
+
+<form action="/messages" method="post">
+	<input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>">
+	<input type="hidden" name="message[user_id]" value="<%= @user.id %>">
+	<input type="textarea" name="message[content]" placeholder="Enter a message">
+	<input type="submit" value="Submit">
+</form>
+
+
+<% @messages.reverse.each do |m| %>
+<div>
+	<%= m.user.name %> - <%= m.created_at.strftime("%b %d, %Y") %>: 
+	<%= m.content %><br>
+	<% if session[:user_id] == m.user.id %>
+	<p><a href="/messages/<%= m.id %>" data-method='delete'><button>Delete</button></a></p>
+	<% end %>
+	<% @comments.each do |c| %>
+		<% if c.message_id == m.id %>
+			<%= c.user.name %> - <%= c.created_at.strftime("%b %d, %Y") %>: 
+			<%= c.content %><br>
+		<% end %>
+	<% end %>
+	<form action="/comments" method="post">
+	<input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>">
+	<input type="hidden" name="comment[message_id]" value="<%= m.id %>">
+	<input type="hidden" name="comment[user_id]" value="<%= @user.id %>">
+	<input type="textarea" name="comment[content]" placeholder="Enter a comment">
+	<input type="submit" value="Submit">
+</form>
+</div>
+<% end %>
+
